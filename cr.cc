@@ -78,6 +78,60 @@ void order_level_tree(int level, int start, int levelcount, int input_counter, i
 }
 
 /*
+* Read the circuit specified in a .real file into array
+*/
+int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int **inputcubes, int **outputcubes){
+	int in, out, k, icounter;
+	string line;
+	cout<<input_counter<<" inputs detected"<<endl;
+	while(line[0] != '.'){
+		getline(real_in_stream,line);
+		cout<< line<<endl;
+	}
+	icounter = 0;
+	while(line[0] != '.' || line[1] != 'e'){
+		if(line[0] == '.' && line[1] == 'i' && line[2] == ' '){
+			string num = "";
+			k = 3;
+			while(line[k] != '\0') num += line[k++];
+			in = atoi(num.c_str());
+			cout <<"in: "<< in<<"  "<<line<<endl;
+			inout[0] = in;
+			for (int y = 0; y < input_counter; y++){
+				inputcubes[y] = new int[inout[0]];
+			}
+
+		}
+		if(line[0] == '.' && line[1] == 'o' && line[2] == ' '){
+			string num = "";
+			k = 3;
+			while(line[k] != '\0') num += line[k++];
+			out = atoi(num.c_str());
+			cout <<"out: "<< out<<"  "<<line<<endl;
+			inout[1] = out;
+			for (int y = 0; y < input_counter; y++){
+				outputcubes[y] = new int[inout[1]];
+			}
+		} else if(line[0] == '0' || line[0] == '1' || line[0]  == '-'){
+			for (int l = 0; l < inout[0]; l++){
+				if(line[l] == '0' || line[l] == '1')	
+					inputcubes[icounter][l] = line[l] - '0';
+				else {
+					inputcubes[icounter][l] = -1;
+				}
+			}
+			for (int l = 0; l < inout[1]; l++){
+                                if(line[l+inout[0]+1] == '0' || line[l+inout[0]+1] == '1')
+                                        outputcubes[icounter][l] = line[l+inout[0]+1] - '0';
+                        }
+			icounter++;
+		}
+		getline(real_in_stream,line);
+	}
+	return 1;
+}
+
+/*
 * Read the circuit specified in a .pla file into array
 */
 int read_pla_file(ifstream& pla_in_stream, int input_counter, int *inout, int **inputcubes, int **outputcubes){
