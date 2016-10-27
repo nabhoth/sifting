@@ -1,0 +1,33 @@
+This directory contains BDD variable orders for several circuits.
+The orders are the best that CUDD has produced over time. For the
+small circuits (less than 20 variables) the orders are optimal. For
+some other circuits they are likely to be optimal. For many others
+there should be room for improvement.
+
+The format of the order files is simply a list of the primary input
+and present state variable names, separated by whitespace. A summary
+table is also included, which gives for each circuit the size of the
+BDDs and the time it took to build the BDDs (once the order was
+given). The sizes are for BDDs with complement arcs and include the
+constant node.
+
+I make these order available in the hope that they will help further
+research on BDDs. First of all, these orders should provide a sanity
+check by allowing one to compare sizes. Second, for people researching
+variable ordering these orders provide a reference point to judge the
+effectiveness of heuristics. Finally, for BDD-based applications not
+directly concerned with variable ordering, these orders may represent
+a convenient way to quickly get meaningful results.
+
+I've tried to make sure the orders are correct. If that's not the
+case, I'd appreciate your feedback (Fabio@Colorado.EDU).
+Not all circuits for which orders are included are in the public
+domain. I've included the orders nonetheless, because I'm not the only
+one who has copies of those circuits, but I cannot redistribute the circuits.
+On the other hand, a few circuits that I personally described are freely
+available and I've prepared a tar file with the blif files. (They are
+mostly arithmetic circuits.)
+
+Enjoy.
+
+Fabio
