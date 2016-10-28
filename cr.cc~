@@ -2164,7 +2164,8 @@ int main(int argc, char *argv[]){
 
 	pla_in_stream.clear();              // forget we hit the end of file
 	pla_in_stream.seekg(0, ios::beg);   // move to the start of the file
-	read_pla_file(pla_in_stream, input_counter, inout, inputcubes, outputcubes);
+	read_pla_file(pla_in_stream, input_counter, inout, inputcubes, outputcubes, true);
+	read_real_file(pla_in_stream, input_counter, inout, inputcubes, outputcubes, true);
 	pla_in_stream.close();
 
 	variable_order = new int[inout[0]];

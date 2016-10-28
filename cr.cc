@@ -83,6 +83,7 @@ void order_level_tree(int level, int start, int levelcount, int input_counter, i
 int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int **inputcubes, int **outputcubes){
 	int in, out, k, icounter;
 	string line;
+	
 	cout<<input_counter<<" inputs detected"<<endl;
 	while(line[0] != '.'){
 		getline(real_in_stream,line);
@@ -2164,7 +2165,8 @@ int main(int argc, char *argv[]){
 
 	pla_in_stream.clear();              // forget we hit the end of file
 	pla_in_stream.seekg(0, ios::beg);   // move to the start of the file
-	read_pla_file(pla_in_stream, input_counter, inout, inputcubes, outputcubes);
+	read_pla_file(pla_in_stream, input_counter, inout, inputcubes, outputcubes, true);
+	read_real_file(pla_in_stream, input_counter, inout, inputcubes, outputcubes, true);
 	pla_in_stream.close();
 
 	variable_order = new int[inout[0]];
