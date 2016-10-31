@@ -80,7 +80,7 @@ void order_level_tree(int level, int start, int levelcount, int input_counter, i
 /*
 * Read the circuit specified in a .real file into array
 */
-int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int **inputcubes, int **outputcubes){
+int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int **cubes){
 	int in, out, k, icounter;
 	string line;
 	
@@ -91,19 +91,21 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 	}
 	icounter = 0;
 	while(line[0] != '.' || line[1] != 'e'){
-		if(line[0] == '.' && line[1] == 'i' && line[2] == ' '){
+		if(line[0] == '.' && line[1] == 'n' && line[2] == 'u'){
 			string num = "";
 			k = 3;
+			while(line[k] != ' ') k++;
+			k++;
 			while(line[k] != '\0') num += line[k++];
 			in = atoi(num.c_str());
 			cout <<"in: "<< in<<"  "<<line<<endl;
 			inout[0] = in;
-			for (int y = 0; y < input_counter; y++){
-				inputcubes[y] = new int[inout[0]];
-			}
+//			for (int y = 0; y < input_counter; y++){
+//				inputcubes[y] = new int[inout[0]];
+//			}
 
 		}
-		if(line[0] == '.' && line[1] == 'o' && line[2] == ' '){
+/*		if(line[0] == '.' && line[1] == 'o' && line[2] == ' '){
 			string num = "";
 			k = 3;
 			while(line[k] != '\0') num += line[k++];
@@ -128,7 +130,7 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 			icounter++;
 		}
 		getline(real_in_stream,line);
-	}
+*/	}
 	return 1;
 }
 
@@ -2123,8 +2125,10 @@ int main(int argc, char *argv[]){
 	int rand0, rand1;
 	int inout[2];
 	int input_counter = 0;
+	int real_counter = 0;
 	int **inputcubes;
 	int **outputcubes;
+	int **realcubes;
 	int **inputcubes_for_process;
 	int **outputcubes_for_process;
 	int *variable_order;
@@ -2134,18 +2138,23 @@ int main(int argc, char *argv[]){
 	int *result;
 	int best_cost = 1000000;
 	int cost = best_cost + 1;
-	ifstream pla_in_stream;
+	ifstream in_stream;
 	string line;
 
 
-	if (argc < 2) {cout<<"File argument needed"<<endl; exit(0);}
-	pla_in_stream.open(argv[1]);	
-	getline(pla_in_stream,line);
-	
+	if (argc < 3) {cout<<"File argument needed"<<endl; exit(0);}
+
+	if (argv[2] == 0){
+
+	char plapath[200] = "../function files/";
+	strcat(plapath,argv[1]);
+	strcat(plapath,".pla");
+	in_stream.open(plapath);	
+	getline(in_stream,line);
 	while(line[0] != '.'){
-		getline(pla_in_stream,line);
+		getline(in_stream,line);
 	}
-	while(!pla_in_stream.eof()){
+	while(!in_stream.eof()){
 		if(line[0] == '.' && line[1] == 'i' && line[2] == ' '){
 
 		}
@@ -2153,9 +2162,29 @@ int main(int argc, char *argv[]){
 		} else if(line[0] == '0' || line[0] == '1' || line[0]  == '-'){
 			input_counter++;
 		}
-		getline(pla_in_stream,line);
+		getline(in_stream,line);
 	}
+	} else {
+	char realpath[200] = "./circuits/";
+	strcat(realpath,argv[1]);
+	strcat(realpath,".real");
+	in_stream.open(realpath);	
 
+	getline(in_stream,line);
+	
+	while(line[0] != '.'){
+		getline(in_stream,line);
+	}
+	while(!in_stream.eof()){
+		cout<<line<<endl;
+		if(line[0] == '.'){
+
+		} else {
+			input_counter++;
+		}
+		getline(in_stream,line);
+	}
+	}
 
 	inputcubes = new int*[input_counter];
 	outputcubes = new int*[input_counter];
@@ -2163,10 +2192,13 @@ int main(int argc, char *argv[]){
 	outputcubes_for_process = new int*[input_counter];
 	result = new int[3];
 
-	pla_in_stream.clear();              // forget we hit the end of file
-	pla_in_stream.seekg(0, ios::beg);   // move to the start of the file
-	read_pla_file(pla_in_stream, input_counter, inout, inputcubes, outputcubes, true);
-	read_real_file(pla_in_stream, input_counter, inout, inputcubes, outputcubes, true);
+	in_stream.clear();              // forget we hit the end of file
+	in_stream.seekg(0, ios::beg);   // move to the start of the file
+	read_pla_file(in_stream, input_counter, inout, inputcubes, outputcubes);
+
+	in_stream.clear();              // forget we hit the end of file
+	in_stream.seekg(0, ios::beg);   // move to the start of the file
+	read_real_file(in_stream, input_counter, inout, inputcubes, outputcubes);
 	pla_in_stream.close();
 
 	variable_order = new int[inout[0]];
@@ -2188,15 +2220,15 @@ int main(int argc, char *argv[]){
 	//for (int a = 0; a <input_counter*inout[0]; a++){
 	//for (int a = 0; a <1; a++){
 
-		//copy the data to array used for p@rocessing the input data
+		//copy the data to array used for processing the input data
 		for (int y = 0; y < input_counter; y++){
 			for(int o =0; o < inout[0]; o++)
 				inputcubes_for_process[y][o] = inputcubes[y][o];
 			for(int o =0; o < inout[1]; o++)
 				outputcubes_for_process[y][o] = outputcubes[y][o];
 		}
-/*
-		cout<<" input data "<<endl;
+
+/*		cout<<" input data "<<endl;
 		for(int o =0; o < inout[0]; o++){ 
 			for(int u =0; u < input_counter; u++){
 				if (inputcubes[u][o] == -1)

@@ -1,0 +1,16 @@
+# Function: mlp4
+# This file has been taken from RevLib (www.revlib.org).
+.ilb x0 x1 x2 x3 x4 x5 x6 x7
+.ob f0 f1 f2 f3 f4 f5 f6 f7
+.i 8
+.o 8
+
+.p7
+00100111 00000110
+00101011 00000110
+00101111 00000110
+10100011 00000110
+10100111 00000110
+10101011 00000110
+10101111 00000110
+.e
