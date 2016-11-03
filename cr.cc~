@@ -817,7 +817,250 @@ int minimize_pla(int input_counter, int *inout, int ***gatearray, int ***cgatear
 	return count;
 }
 
+/***************************************
+* sifts the circuit according to the analytic method
+* by calculating each cost of gate w.r.t. to target qubit - value 3
+****************************************/
+void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **outputcubes, int **var_order, int *result){
+	int counter, tocount, ocounter, m, bestsum, currentsum;
+	int level, icountindex, gatecost, ancilla, twobitg, threebitg, dcarecount, gatecostmin;
+	int target;
+	int cube_counter;
+	int *mccs;
+	int *qws;
+	int *best_var_order;
+	int *last_var_order;
+	int *reorder_array[inout[0]];
+	int *inputOcubes[input_counter*4];
+	int *outputOcubes[input_counter*4];
+	short *wirearray[input_counter];
 
+	best_var_order = new int[inout[0]];
+	last_var_order = new int[inout[0]];
+	for (int p = 0; p < inout[0]; p++){
+		best_var_order[p] = (*var_order)[p];
+		last_var_order[p] = (*var_order)[p];
+	}
+
+	for (int x = 0; x < (inout[0]); x++){
+		reorder_array[x] = new int[input_counter*4];
+	}
+	for (int y = 0; y < input_counter; y++){
+		wirearray[y] = new short[inout[0]];
+	}
+	for (int y = 0; y < input_counter*4; y++){
+		inputOcubes[y] = new int[inout[0]];
+		for (int x = 0; x < inout[0]; x++){
+			inputOcubes[y][x] = 0;
+		}
+		outputOcubes[y] = new int[inout[1]];
+		for (int x = 0; x < inout[1]; x++){
+			outputOcubes[y][x] = 0;
+		}
+	}
+
+
+
+	for(int u =0; u < input_counter; u++){
+		for(int o =0; o < inout[0]; o++) wirearray[u][o] = inputcubes[u][o];
+	}
+
+
+
+	/* order the circuit by descending order on the input lines */
+/*	counter = -1;	
+	ocounter = 0;
+	tocount = -1;
+	level = 0;
+	icountindex = 0;
+	while(ocounter < input_counter){
+		cube_counter = 0;
+		for (int u = 0; u < input_counter; u++){
+			if (tocount ==inputcubes[u][level]){
+				if (counter != tocount) {counter = tocount;}
+				for (int v =0; v < inout[0];v++) inputOcubes[ocounter][v] = inputcubes[u][v];
+				if (level == 0)
+					for (int v =0; v < inout[1];v++) outputOcubes[ocounter][v] = outputcubes[u][v];
+				ocounter++;
+				cube_counter++;
+			}
+		}
+		order_level_tree(level+2, icountindex, cube_counter, input_counter, inout[0], inputOcubes, inout[1], outputOcubes);
+		icountindex += cube_counter;
+		tocount++;
+
+	}
+
+*/
+
+	//function representation output
+	cout<<"---------------------------"<<endl;
+	for(int o =0; o < inout[0]; o++){ 
+		for(int u =0; u < input_counter; u++){
+			cout<<wirearray[u][o]<<", ";
+		}
+		cout<<endl;
+	}
+
+	cout<<"---------------------------"<<endl;
+	for(int o =0; o < inout[0]; o++){ 
+		for(int u =0; u < input_counter; u++){
+			reorder_array[o][u] = wirearray[u][o];
+		}
+	}
+
+	cout<<"MCCs:\n";
+	mccs = new int[input_counter];
+	int sum = 0;
+	for(int u = 0; u<input_counter; u++){
+		for (int o =0; o<inout[0]; o++){
+			if (reorder_array[o][u]== 3){
+				target = o;
+				break;
+			}
+		}
+		mccs[u] = 0;
+		for(int o =inout[0]-1; o>=0; o--){ 
+			if (reorder_array[o][u]> 0 && reorder_array[o][u] != 3) {
+				mccs[u] += abs(target-o)-1;
+				if ((target-o) > 0){
+					target--;
+				} else {
+					target++;
+				}
+			}
+		}
+		sum += mccs[u];
+	}
+	bestsum = sum;
+	lastsum = sum;	
+	cout<<"Minterm sum :"<<sum;
+	cout<<endl;
+	cout<<"QWSs:\n";
+	qws = new int[inout[0]];
+	for(int o =0; o < inout[0]; o++){ 
+		qws[o] = 0;
+		for(int u =0; u < input_counter; u++){
+			if (reorder_array[o][u]> 0) qws[o]++;
+		}
+//		cout<<"Qubit "<<o<<" :"<<qws[o]<<endl;
+	}
+
+	/* Reorder the qubits */
+	int *temp;
+	int tem;
+		for (int p = 0; p < inout[0]; p++){
+			cout<<" wire/cost: "<<(*var_order)[p]<<"/"<<qws[p];
+		}
+		cout<<endl;
+	cout<<endl;
+
+	for(int o =0; o < inout[0]; o++){ 
+		for(int p =o+1; p < inout[0]; p++){ 
+			if (qws[o] > qws [p]){
+				temp = reorder_array[p];
+				reorder_array[p] = reorder_array[o];
+				reorder_array[o] = temp;
+				tem = qws[p];
+				qws[p] = qws[o];
+				qws[o] = tem;
+
+				tem = last_var_order[p];
+				last_var_order[p] = last_var_order[o];
+				last_var_order[o] = tem;
+			}		
+		}
+
+
+	cout<<"MCCs:\n";
+	mccs = new int[input_counter];
+	sum = 0;
+	for(int u = 0; u<input_counter; u++){
+		for (int o =0; o<inout[0]; o++){
+			if (reorder_array[o][u]== 3){
+				target = o;
+				break;
+			}
+		}
+		mccs[u] = 0;
+		for(int o =inout[0]-1; o>=0; o--){ 
+			if (reorder_array[o][u]> 0 && reorder_array[o][u] != 3) {
+				mccs[u] += abs(target-o)-1;
+				if ((target-o) > 0){
+					target--;
+				} else {
+					target++;
+				}
+			}
+		}
+		sum += mccs[u];
+	}
+
+	cout<<"Minterm sum :"<<sum;
+//	cout<<endl;
+	if (sum < bestsum){
+		for (int o =0; o<inout[0]; o++){
+			best_var_order[o] = last_var_order[o];
+			bestsum = sum;
+		}
+	}	
+
+	}
+	cout<<"MCCs:\n";
+	mccs = new int[input_counter];
+	sum = 0;
+	for(int u = 0; u<input_counter; u++){
+		for (int o =0; o<inout[0]; o++){
+			if (reorder_array[o][u]== 3){
+				target = o;
+				break;
+			}
+		}
+		mccs[u] = 0;
+		for(int o =inout[0]-1; o>=0; o--){ 
+			if (reorder_array[o][u]> 0 && reorder_array[o][u] != 3) {
+				mccs[u] += abs(target-o)-1;
+				if ((target-o) > 0){
+					target--;
+				} else {
+					target++;
+				}
+			}
+		}
+		sum += mccs[u];
+	}
+	
+	cout<<"Minterm sum :"<<sum;
+	cout<<endl;
+
+		for (int p = 0; p < inout[0]; p++){
+			cout<<" wire/cost: "<<(*var_order)[p]<<"/"<<qws[p];
+		}
+
+		cout<<endl;
+	cout<<endl;
+
+	for(int o =0; o < inout[0]; o++){ 
+		for(int u =0; u < input_counter; u++){
+			wirearray[u][o] = reorder_array[o][u];
+		}
+	}
+	for (int p = 0; p < inout[0]; p++){
+		(*var_order)[p] = best_var_order[p];
+	}
+
+	//function representation output
+	cout<<"---------------------------"<<endl;
+	for(int o =0; o < inout[0]; o++){ 
+		for(int u =0; u < input_counter; u++){
+			cout<<wirearray[u][o]<<", ";
+		}
+		cout<<endl;
+	}
+
+	cout<<"---------------------------"<<endl;
+
+}
 /***************************************
 * parameter full 
 * full = 0 the pla is a completely specified Multi-input multi-output reversible function
@@ -828,7 +1071,7 @@ int minimize_pla(int input_counter, int *inout, int ***gatearray, int ***cgatear
 void sift_pla(int full, int input_counter, int *inout, int **inputcubes, int **outputcubes, int **var_order, int *result){
 	int counter, tocount, ocounter, m;
 	int level, icountindex, gatecost, ancilla, twobitg, threebitg, dcarecount, gatecostmin;
-//	int c1, c2, target;
+	int target;
 	int cube_counter;
 	int *mccs;
 	int *qws;
@@ -2270,7 +2513,12 @@ int main(int argc, char *argv[]){
 			cout<<variable_order[y]<<" ";
 		cout<<endl;
 */
-		sift_pla(0, input_counter, inout, inputcubes_for_process, outputcubes_for_process, &variable_order, result);
+		if (argv[2][0] == '0'){
+			sift_pla(0, input_counter, inout, inputcubes_for_process, outputcubes_for_process, &variable_order, result);
+		} else {
+			sift_pla2(0, input_counter, inout, inputcubes_for_process, outputcubes_for_process, &variable_order, result);
+		}
+
 		if (cost < best_cost){
 			best_cost = result[0];
 			best_threebit = result[1];
