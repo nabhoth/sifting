@@ -996,7 +996,7 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 	}
 
 	cout<<"Minterm sum :"<<sum;
-//	cout<<endl;
+	cout<<endl;
 	if (sum < bestsum){
 		for (int o =0; o<inout[0]; o++){
 			best_var_order[o] = last_var_order[o];
@@ -1037,6 +1037,27 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		}
 
 		cout<<endl;
+		for (int p = 0; p < inout[0]; p++){
+			cout<<" wire: "<<last_var_order[p];
+		}
+	cout<<endl;
+
+
+		for (int p = 0; p < inout[0]; p++){
+			while (last_var_order[p] != p){
+				temp = reorder_array[last_var_order[p]];
+				reorder_array[last_var_order[p]] = reorder_array[p];
+				reorder_array[p] = temp;
+
+				tem = last_var_order[p];
+				last_var_order[p] = last_var_order[tem];
+				last_var_order[tem] = tem;
+			}
+
+		}
+		for (int p = 0; p < inout[0]; p++){
+			cout<<" wire: "<<last_var_order[p];
+		}
 	cout<<endl;
 
 	for(int o =0; o < inout[0]; o++){ 

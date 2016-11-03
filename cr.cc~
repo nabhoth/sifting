@@ -822,7 +822,7 @@ int minimize_pla(int input_counter, int *inout, int ***gatearray, int ***cgatear
 * by calculating each cost of gate w.r.t. to target qubit - value 3
 ****************************************/
 void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **outputcubes, int **var_order, int *result){
-	int counter, tocount, ocounter, m, bestsum, currentsum;
+	int counter, tocount, ocounter, m, bestsum;
 	int level, icountindex, gatecost, ancilla, twobitg, threebitg, dcarecount, gatecostmin;
 	int target;
 	int cube_counter;
@@ -933,7 +933,6 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		sum += mccs[u];
 	}
 	bestsum = sum;
-	lastsum = sum;	
 	cout<<"Minterm sum :"<<sum;
 	cout<<endl;
 	cout<<"QWSs:\n";
@@ -1006,7 +1005,7 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 	}	
 
 	}
-	cout<<"MCCs:\n";
+/*	cout<<"MCCs:\n";
 	mccs = new int[input_counter];
 	sum = 0;
 	for(int u = 0; u<input_counter; u++){
@@ -1029,7 +1028,7 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		}
 		sum += mccs[u];
 	}
-	
+*/	
 	cout<<"Minterm sum :"<<sum;
 	cout<<endl;
 
@@ -1038,6 +1037,27 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		}
 
 		cout<<endl;
+		for (int p = 0; p < inout[0]; p++){
+			cout<<" wire: "<<last_var_order[p];
+		}
+	cout<<endl;
+
+
+		for (int p = 0; p < inout[0]; p++){
+			while (last_var_order[p] != p){
+				temp = reorder_array[last_var_order[p]];
+				reorder_array[last_var_order[p]] = reorder_array[p];
+				reorder_array[p] = temp;
+
+				tem = last_var_order[p];
+				last_var_order[p] = last_var_order[tem];
+				last_var_order[tem] = tem;
+			}
+
+		}
+		for (int p = 0; p < inout[0]; p++){
+			cout<<" wire: "<<last_var_order[p];
+		}
 	cout<<endl;
 
 	for(int o =0; o < inout[0]; o++){ 
