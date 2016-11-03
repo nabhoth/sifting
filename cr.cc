@@ -81,7 +81,7 @@ void order_level_tree(int level, int start, int levelcount, int input_counter, i
 * Read the circuit specified in a .real file into array
 */
 int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int **inputcubes, int **outputcubes){
-	int in, out, k, icounter, vcounter, vsize;
+	int in, out, k, icounter, vcounter, vsize, incounter;
 	string line;
 	char **vars;
 	bool readd;
@@ -91,11 +91,12 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 	cout<<input_counter<<" inputs detected: "<<readd<<endl;
 	while(line[0] != '.'){
 		getline(real_in_stream,line);
-		cout<< line<<"  "<<readd<<endl;
+//		cout<< line<<"  "<<readd<<endl;
 	}
 	readd = false;
 	icounter = 0;
 	vcounter = 0;
+	incounter = 0;
 	while(line[0] != '.' || line[1] != 'e'){
 
 		if(line[0] == '.' && line[1] == 'n' && line[2] == 'u'){
@@ -111,9 +112,21 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 			for (int y = 0; y < input_counter; y++){
 				inputcubes[y] = new int[inout[0]];
 				outputcubes[y] = new int[inout[0]];
+				for (int a = 0; a < inout[0];a++){
+					inputcubes[y][a] = 0;
+					outputcubes[y][a] = 0;
+				}
 			}
+/*			for (int a = 0; a < inout[0];a++){
+				for (int b = 0; b <input_counter; b++){
+		 			cout<<inputcubes[b][a]<<",";
+				}
+				cout<<endl;
+			}		
+			cout<<endl;
+
 			cout<<inout[0]<<endl;
-			vars = new char*[inout[0]];
+*/			vars = new char*[inout[0]];
 			for (int a =0; a<inout[0]; a++){
 				vars[a] = new char[20];
 			}
@@ -137,36 +150,45 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 			}
 			vars[vcounter][icounter] = '\0';
 		}
-
 		if (readd){
-			cout<<line<<endl;
+//			cout<<line<<endl;
 			k = 0;
 			//skip the target indication
 			while(line[k] != ' ')k++;
 			k++;
 			vcounter = 0;
 			vsize = 0;
-			while(line[k] != '\0') {
+			//while(line[k] != '\0') {
+			while(true) {
 				var[vcounter++] = line[k++];
 				vsize++;
 				if (line[k] == ' ' || line[k] == '\0'){
 					var[vcounter] ='\0';
-					int p = 0;
+//					cout<<var<<"  ";
 					for (int p = 0; p < inout[0]; p++){
 						found = true;
 						for(int g = 0; g < vsize; g++){
 							if (var[g] != vars[p][g]) found = false;
 						}
 						if(found){
-							cout<<"Found match: "<<var<<"  "<<vars[p]<<endl;
+//							cout<<"Found match: "<<incounter<<"  :: "<<vars[p]<<endl;
+							if (line[k] == '\0') {
+								inputcubes[incounter][p] = 3;
+							} else {
+								inputcubes[incounter][p] = 1;
+							}
+
 							break;
 						}
 					 
 					}
+					vsize = 0;
 					vcounter = 0;
+					if (line[k] == '\0') break;
 					k++;
 				}
 			}
+			incounter++;
 		}
 		if(line[0] == '.' && line[1] == 'b' && line[2]  == 'e'){
 			readd = true;
@@ -174,7 +196,6 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 		}
 		getline(real_in_stream,line);
 	}
-	exit(0);
 	return 1;
 }
 
@@ -805,67 +826,30 @@ int minimize_pla(int input_counter, int *inout, int ***gatearray, int ***cgatear
 * full = 3  multi-input and single output function that requires embedding
 ****************************************/
 void sift_pla(int full, int input_counter, int *inout, int **inputcubes, int **outputcubes, int **var_order, int *result){
-	int input_index, output_index, counter, tocount, ocounter, m;
+	int counter, tocount, ocounter, m;
 	int level, icountindex, gatecost, ancilla, twobitg, threebitg, dcarecount, gatecostmin;
-	int c1, c2, target;
+	int target;
 	int cube_counter;
 	int *mccs;
 	int *qws;
 	int *reorder_array[inout[0]];
 	int *inputOcubes[input_counter*4];
 	int *outputOcubes[input_counter*4];
-	float gatearray[input_counter*4];
-	float controlcounter[input_counter*4];
 	short *wirearray[input_counter*4];
-	int *wireIarray[input_counter*4];
-	char *wireCarray[input_counter*4];
-	char *wirePCarray[input_counter*4];
-	char *wireCVCarray[input_counter*50];
-	char **finalwirePCarray[input_counter*4];
-	char *finalarray[input_counter*4];
-	int **finalgatearray[input_counter*4];
-	int **finalCgatearray[input_counter*4];
-//	string *wireSarray[input_counter*4];
-	bool different[input_counter*4];
-	int top_controls[input_counter*4];
-	bool bottom;
-	char variables[input_counter*4];
-	short ancillas[input_counter*4];
-	char r = 'r';
 
 	for (int x = 0; x < (inout[0]); x++){
 		reorder_array[x] = new int[input_counter*4];
 	}
-
-	for (int y = 0; y < input_counter*20; y++)
-		wireCVCarray[y] = new char[inout[0]*2];
 	for (int y = 0; y < input_counter*4; y++){
-		inputOcubes[y] = new int[inout[0]];
-		for (int x = 0; x < inout[0]; x++)
-			inputOcubes[y][x] = 0;
 		wirearray[y] = new short[inout[0]];
-		wireIarray[y] = new int[inout[0]];
-		wireCarray[y] = new char[inout[0]];
-		wirePCarray[y] = new char[inout[0]*2];
-		finalarray[y] = new char[inout[0]*2];
-//		wireSarray[y] = new string[inout[0]];
-		finalgatearray[y] = new int*[inout[0]*2];
-		finalCgatearray[y] = new int*[inout[0]*2];
-		for (int x = 0; x < (inout[0]*2); x++){
-			finalgatearray[y][x] = new int[2];
-			finalgatearray[y][x][0] = -1;
-			finalgatearray[y][x][1] = -1;
-			finalCgatearray[y][x] = new int[4];
-			finalCgatearray[y][x][0] = -10;
-			finalCgatearray[y][x][1] = -10;
-			finalCgatearray[y][x][2] = -10;
-			finalCgatearray[y][x][3] = -10;
+		inputOcubes[y] = new int[inout[0]];
+		for (int x = 0; x < inout[0]; x++){
+			inputOcubes[y][x] = 0;
 		}
-	}
-	for (int y = 0; y < input_counter*4; y++){
 		outputOcubes[y] = new int[inout[1]];
-		for (int x = 0; x < inout[1]; x++)
+		for (int x = 0; x < inout[1]; x++){
 			outputOcubes[y][x] = 0;
+		}
 	}
 
 
@@ -983,8 +967,6 @@ void sift_pla(int full, int input_counter, int *inout, int **inputcubes, int **o
 	for(int o =0; o < inout[0]*2; o++){ 
 		for(int u =0; u < input_counter; u++){
 			cout<<wirearray[u][o]<<", ";
-			wireCarray[u][o] = '-';
-			wirePCarray[u][o] = '-';
 		}
 		cout<<endl;
 	}
@@ -2263,7 +2245,7 @@ int main(int argc, char *argv[]){
 				outputcubes_for_process[y][o] = outputcubes[y][o];
 		}
 
-/*		cout<<" input data "<<endl;
+		cout<<" input data "<<endl;
 		for(int o =0; o < inout[0]; o++){ 
 			for(int u =0; u < input_counter; u++){
 				if (inputcubes[u][o] == -1)
@@ -2282,7 +2264,7 @@ int main(int argc, char *argv[]){
 			cout<<endl;
 		}
 		cout<<endl;
-*/
+
 /*		cout<<"Ordering of the variables: ";
 		for (int y = 0; y < inout[0]; y++)
 			cout<<variable_order[y]<<" ";
