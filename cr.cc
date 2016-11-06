@@ -135,8 +135,9 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 		if(line[0] == '.' && line[1] == 'v' && line[2] == 'a'){
 			string num = "";
 			k = 3;
+			cout<<line<<endl;
 			while(line[k] != ' ')k++; 
-			k++;
+			while(line[k] == ' ')k++; 
 			icounter = 0;
 			while(line[k] != '\0') {
 				if(line[k] == ' ') {
@@ -146,12 +147,13 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 				} else {
 					vars[vcounter][icounter++] = line[k];
 				}
+//			cout<<vars[vcounter][icounter]<<endl;
 				k++;
 			}
 			vars[vcounter][icounter] = '\0';
 		}
 		if (readd){
-//			cout<<line<<endl;
+			cout<<line<<endl;
 			k = 0;
 			//skip the target indication
 			while(line[k] != ' ')k++;

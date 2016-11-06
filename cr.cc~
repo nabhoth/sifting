@@ -135,6 +135,7 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 		if(line[0] == '.' && line[1] == 'v' && line[2] == 'a'){
 			string num = "";
 			k = 3;
+			cout<<line<<endl;
 			while(line[k] != ' ')k++; 
 			k++;
 			icounter = 0;
@@ -146,12 +147,13 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 				} else {
 					vars[vcounter][icounter++] = line[k];
 				}
+//			cout<<vars[vcounter][icounter]<<endl;
 				k++;
 			}
 			vars[vcounter][icounter] = '\0';
 		}
 		if (readd){
-//			cout<<line<<endl;
+			cout<<line<<endl;
 			k = 0;
 			//skip the target indication
 			while(line[k] != ' ')k++;
@@ -996,7 +998,7 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 	}
 
 	cout<<"Minterm sum :"<<sum;
-//	cout<<endl;
+	cout<<endl;
 	if (sum < bestsum){
 		for (int o =0; o<inout[0]; o++){
 			best_var_order[o] = last_var_order[o];
