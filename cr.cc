@@ -153,7 +153,7 @@ int read_real_file(ifstream& real_in_stream, int input_counter, int *inout, int 
 			vars[vcounter][icounter] = '\0';
 		}
 		if (readd){
-			cout<<line<<endl;
+//			cout<<line<<endl;
 			k = 0;
 			//skip the target indication
 			while(line[k] != ' ')k++;
@@ -868,33 +868,7 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 	}
 
 
-
-	/* order the circuit by descending order on the input lines */
-/*	counter = -1;	
-	ocounter = 0;
-	tocount = -1;
-	level = 0;
-	icountindex = 0;
-	while(ocounter < input_counter){
-		cube_counter = 0;
-		for (int u = 0; u < input_counter; u++){
-			if (tocount ==inputcubes[u][level]){
-				if (counter != tocount) {counter = tocount;}
-				for (int v =0; v < inout[0];v++) inputOcubes[ocounter][v] = inputcubes[u][v];
-				if (level == 0)
-					for (int v =0; v < inout[1];v++) outputOcubes[ocounter][v] = outputcubes[u][v];
-				ocounter++;
-				cube_counter++;
-			}
-		}
-		order_level_tree(level+2, icountindex, cube_counter, input_counter, inout[0], inputOcubes, inout[1], outputOcubes);
-		icountindex += cube_counter;
-		tocount++;
-
-	}
-
-*/
-
+/*
 	//function representation output
 	cout<<"---------------------------"<<endl;
 	for(int o =0; o < inout[0]; o++){ 
@@ -905,13 +879,13 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 	}
 
 	cout<<"---------------------------"<<endl;
-	for(int o =0; o < inout[0]; o++){ 
+*/	for(int o =0; o < inout[0]; o++){ 
 		for(int u =0; u < input_counter; u++){
 			reorder_array[o][u] = wirearray[u][o];
 		}
 	}
 
-	cout<<"MCCs:\n";
+//	cout<<"MCCs:\n";
 	mccs = new int[input_counter];
 	int sum = 0;
 	for(int u = 0; u<input_counter; u++){
@@ -935,10 +909,10 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		sum += mccs[u];
 	}
 	bestsum = sum;
-	cout<<"Minterm sum :"<<sum;
+/*	cout<<"Minterm sum :"<<sum;
 	cout<<endl;
 	cout<<"QWSs:\n";
-	qws = new int[inout[0]];
+*/	qws = new int[inout[0]];
 	for(int o =0; o < inout[0]; o++){ 
 		qws[o] = 0;
 		for(int u =0; u < input_counter; u++){
@@ -950,12 +924,12 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 	/* Reorder the qubits */
 	int *temp;
 	int tem;
-		for (int p = 0; p < inout[0]; p++){
+/*		for (int p = 0; p < inout[0]; p++){
 			cout<<" wire/cost: "<<(*var_order)[p]<<"/"<<qws[p];
 		}
 		cout<<endl;
 	cout<<endl;
-
+*/
 	for(int o =0; o < inout[0]; o++){ 
 		for(int p =o+1; p < inout[0]; p++){ 
 			if (qws[o] > qws [p]){
@@ -973,7 +947,7 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		}
 
 
-	cout<<"MCCs:\n";
+//	cout<<"MCCs:\n";
 	mccs = new int[input_counter];
 	sum = 0;
 	for(int u = 0; u<input_counter; u++){
@@ -997,8 +971,8 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		sum += mccs[u];
 	}
 
-	cout<<"Minterm sum :"<<sum;
-	cout<<endl;
+//	cout<<"Minterm sum :"<<sum;
+//	cout<<endl;
 	if (sum < bestsum){
 		for (int o =0; o<inout[0]; o++){
 			best_var_order[o] = last_var_order[o];
@@ -1031,7 +1005,7 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		sum += mccs[u];
 	}
 */	
-	cout<<"Minterm sum :"<<sum;
+/*	cout<<"Minterm sum :"<<sum;
 	cout<<endl;
 
 		for (int p = 0; p < inout[0]; p++){
@@ -1043,7 +1017,7 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 			cout<<" wire: "<<last_var_order[p];
 		}
 	cout<<endl;
-
+*/
 
 		for (int p = 0; p < inout[0]; p++){
 			while (last_var_order[p] != p){
@@ -1057,11 +1031,11 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 			}
 
 		}
-		for (int p = 0; p < inout[0]; p++){
+/*		for (int p = 0; p < inout[0]; p++){
 			cout<<" wire: "<<last_var_order[p];
 		}
 	cout<<endl;
-
+*/
 	for(int o =0; o < inout[0]; o++){ 
 		for(int u =0; u < input_counter; u++){
 			wirearray[u][o] = reorder_array[o][u];
@@ -1070,7 +1044,7 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 	for (int p = 0; p < inout[0]; p++){
 		(*var_order)[p] = best_var_order[p];
 	}
-
+/*
 	//function representation output
 	cout<<"---------------------------"<<endl;
 	for(int o =0; o < inout[0]; o++){ 
@@ -1081,7 +1055,8 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 	}
 
 	cout<<"---------------------------"<<endl;
-
+*/
+	result[0] = bestsum;
 }
 /***************************************
 * parameter full 
@@ -1094,6 +1069,7 @@ void sift_pla(int full, int input_counter, int *inout, int **inputcubes, int **o
 	int counter, tocount, ocounter, m;
 	int level, icountindex, gatecost, ancilla, twobitg, threebitg, dcarecount, gatecostmin;
 	int target;
+	int bestsum;
 	int cube_counter;
 	int *mccs;
 	int *qws;
@@ -1257,7 +1233,7 @@ void sift_pla(int full, int input_counter, int *inout, int **inputcubes, int **o
 		}
 		sum += mccs[u];
 	}
-	
+	bestsum = sum;	
 	cout<<"Minterm sum :"<<sum;
 	cout<<endl;
 	cout<<"QWSs:\n";
@@ -1318,6 +1294,9 @@ cout<<" address: "<<var_order<<"  "<<*var_order<<endl<<endl;;
 //	cout<<"Minterm sum :"<<sum;
 //	cout<<endl;
 
+	if (bestsum > sum){
+		bestsum = sum;
+	}
 	}
 	cout<<"MCCs:\n";
 	mccs = new int[input_counter];
@@ -1333,16 +1312,21 @@ cout<<" address: "<<var_order<<"  "<<*var_order<<endl<<endl;;
 		}
 		sum += mccs[u];
 	}
-	cout<<"Minterm sum :"<<sum;
-	cout<<endl;
+//	cout<<"Minterm sum :"<<sum;
+//	cout<<endl;
 
-		for (int p = 0; p < inout[0]; p++){
-			cout<<" wire/cost: "<<(*var_order)[p]<<"/"<<qws[p];
-		}
+//		for (int p = 0; p < inout[0]; p++){
+//			cout<<" wire/cost: "<<(*var_order)[p]<<"/"<<qws[p];
+//		}
+//
+//		cout<<endl;
+//	cout<<endl;
 
-		cout<<endl;
-	cout<<endl;
+	if (bestsum > sum){
+		bestsum = sum;
+	}
 
+	result[0] = bestsum;
 }
 
 
@@ -2510,7 +2494,7 @@ int main(int argc, char *argv[]){
 				outputcubes_for_process[y][o] = outputcubes[y][o];
 		}
 
-		cout<<" input data "<<endl;
+/*		cout<<" input data "<<endl;
 		for(int o =0; o < inout[0]; o++){ 
 			for(int u =0; u < input_counter; u++){
 				if (inputcubes[u][o] == -1)
@@ -2529,7 +2513,7 @@ int main(int argc, char *argv[]){
 			cout<<endl;
 		}
 		cout<<endl;
-
+*/
 /*		cout<<"Ordering of the variables: ";
 		for (int y = 0; y < inout[0]; y++)
 			cout<<variable_order[y]<<" ";
@@ -2566,6 +2550,7 @@ int main(int argc, char *argv[]){
 	for (int y = 0; y < inout[0]; y++)
 		cout<<variable_order[y]<<" ";
 	cout<<endl;
+	cout<<"Best Cost of SWAP gates: "<<result[0]<<endl;
 	cout<<"---------- Best Results ----------"<<endl;
 return 0;
 }
