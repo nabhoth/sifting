@@ -942,22 +942,22 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 //				cout<<" tar: "<<target<<" arr: "<<j ;
 					if (reorder_array[j][u] == 0){
 						mccs[u] += abs(j-o);
-						cout<<endl<<" diff: "<<(j-o)<<endl;
+//						cout<<endl<<" diff: "<<(j-o)<<endl;
 
 						temp = reorder_array[o];
 						reorder_array[o] = reorder_array[j];
 						reorder_array[j] = temp;
 						
-						cout<<endl<<" diff: "<<(j-o)<<endl;
+//						cout<<endl<<" diff: "<<(j-o)<<endl;
 						tem = qws[o];
 						qws[o] = qws[j];
 						qws[j] = tem;
 						
-						cout<<endl<<" diff: "<<(j-o)<<endl;
+//						cout<<endl<<" diff: "<<(j-o)<<endl;
 						tem = runn_var_order[o];
 						runn_var_order[o] = runn_var_order[j];
 						runn_var_order[j] = tem;
-						cout<<endl<<" diff: "<<(j-o)<<endl;
+//						cout<<endl<<" diff: "<<(j-o)<<endl;
 						break;
 					}
 				}
@@ -1050,22 +1050,20 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 //				cout<<" tar: "<<target<<" arr: "<<j ;
 					if (reorder_array[j][u] == 0){
 						mccs[u] += abs(j-o);
-						cout<<endl<<" diff: "<<(j-o)<<endl;
+//						cout<<endl<<" diff: "<<(j-o)<<endl;
 
 						temp = reorder_array[o];
 						reorder_array[o] = reorder_array[j];
 						reorder_array[j] = temp;
 						
-						cout<<endl<<" diff: "<<(j-o)<<endl;
+///						cout<<endl<<" diff: "<<(j-o)<<endl;
 						tem = qws[o];
 						qws[o] = qws[j];
 						qws[j] = tem;
 						
-						cout<<endl<<" diff: "<<(j-o)<<endl;
 						tem = runn_var_order[o];
 						runn_var_order[o] = runn_var_order[j];
 						runn_var_order[j] = tem;
-						cout<<endl<<" diff: "<<(j-o)<<endl;
 						break;
 					}
 				}
@@ -1114,13 +1112,16 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		}
 	}
 
-	for(int o =0; o < inout[0]; o++){ 
-		for(int u =0; u < input_counter; u++){
-			wirearray[u][o] = reorder_array[o][u];
-		}
-	}
 	for (int p = 0; p < inout[0]; p++){
 		(*var_order)[p] = best_var_order[p];
+	}
+
+	for(int o =0; o < inout[0]; o++){ 
+		if (best_var_order[o] != o){
+			for(int u =0; u < input_counter; u++){
+				wirearray[u][o] = reorder_array[best_var_order[o]][u];
+			}
+		}
 	}
 
 	//function representation output
@@ -1132,6 +1133,12 @@ void sift_pla2(int full, int input_counter, int *inout, int **inputcubes, int **
 		cout<<endl;
 	}
 
+	cout<<"---------------------------"<<endl;
+	cout<<" Best Sum: "<<bestsum<<endl;
+	cout<<" Best order: ";
+	for (int i = 0;i <inout[0];i++)
+		cout<<best_var_order[i]<<", ";
+	cout<<endl;
 	cout<<"---------------------------"<<endl;
 
 	exit(0);
